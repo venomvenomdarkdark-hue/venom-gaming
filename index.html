@@ -230,6 +230,7 @@ header h2 {
     color: #86c4ff;
 }
 
+/* مكتبة الألعاب */
 .games {
     padding: 25px 18px 50px;
     max-width: 800px;
@@ -278,6 +279,13 @@ header h2 {
     color: #c0e0ff;
     border: 1px solid #426b98;
     border-radius: 7px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.card button:active {
+    background: #245080;
+    transform: scale(.98);
 }
 
 footer {
@@ -300,6 +308,7 @@ footer {
 <body>
 
 <div class="storm"></div>
+
 <div class="flash" id="flash">
     <div class="bolt"></div>
 </div>
@@ -327,6 +336,7 @@ footer {
 </header>
 
 <section class="hero">
+
     <h1>VENOM <span>GAMING</span></h1>
 
     <p>
@@ -339,47 +349,40 @@ footer {
         اللي بيدي الأفكار لصاحب الموقع:
         <strong>DRAGON 🐉</strong>
     </div>
+
 </section>
 
+<!-- الألعاب المتاحة -->
 <section class="games">
+
     <h2>🎮 مكتبة الألعاب</h2>
 
     <div class="grid">
 
+        <!-- لعبة الظلام: كما هي -->
         <div class="card">
             <div class="icon">🌑</div>
             <h3>لعبة الظلام</h3>
             <p>مغامرة غامضة وسط الظلام.</p>
+
             <button onclick="openGame('darkness.html')">
                 العب الآن
             </button>
         </div>
 
+        <!-- لعبة الفرخة -->
         <div class="card">
-            <div class="icon">🚗</div>
-            <h3>لعبة السيارات</h3>
-            <p>انطلق في عالم القيادة.</p>
-            <button onclick="openGame('cars.html')">
-                العب الآن
-            </button>
-        </div>
+            <div class="icon">🐔</div>
+            <h3>CHICKEN WARS</h3>
+            <p>استعد للمغامرة وابدأ حرب الفرخة!</p>
 
-        <div class="card">
-            <div class="icon">🧟</div>
-            <h3>عالم الزومبي</h3>
-            <p>واجه تحديات عالم الزومبي.</p>
-            <button onclick="openGame('zombies.html')">
-                العب الآن
+            <button onclick="openGame('chicken-wars.html')">
+                🐔 العب لعبة الفرخة
             </button>
-        </div>
-
-        <div class="card">
-            <div class="icon">🐉</div>
-            <h3>لعبة جديدة</h3>
-            <p>ترقب مغامراتنا القادمة.</p>
         </div>
 
     </div>
+
 </section>
 
 <footer>
@@ -389,7 +392,7 @@ footer {
     © 2026
 </footer>
 
-<!-- صوت الرعد: هنضيف ملفه في خطوة لاحقة -->
+<!-- صوت الرعد -->
 <audio id="thunderSound" preload="auto">
     <source src="thunder.mp3" type="audio/mpeg">
 </audio>
@@ -413,25 +416,22 @@ const soundButton = document.getElementById("soundButton");
 let soundEnabled = false;
 
 async function enableSound() {
-    soundEnabled = true;
+    if (soundEnabled) {
+        thunder.pause();
+        soundEnabled = false;
+        soundButton.textContent = "🔊 تشغيل الصوت";
+        return;
+    }
 
     try {
         thunder.loop = true;
         await thunder.play();
+        soundEnabled = true;
         soundButton.textContent = "🔇 إيقاف الصوت";
     } catch (error) {
-        soundEnabled = false;
         alert("ملف صوت الرعد لسه مش موجود أو المتصفح منع تشغيله.");
     }
 }
-
-soundButton.addEventListener("click", async () => {
-    if (soundEnabled && !thunder.paused) {
-        thunder.pause();
-        soundEnabled = false;
-        soundButton.textContent = "🔊 تشغيل الصوت";
-    }
-});
 
 function strikeLightning() {
     flash.classList.remove("active");
@@ -440,6 +440,7 @@ function strikeLightning() {
 }
 
 window.addEventListener("load", () => {
+
     // برق خفيف في البداية
     setTimeout(strikeLightning, 700);
 
@@ -461,6 +462,7 @@ window.addEventListener("load", () => {
         setTimeout(() => {
             intro.style.display = "none";
         }, 1100);
+
     }, 6500);
 });
 
