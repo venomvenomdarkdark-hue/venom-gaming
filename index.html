@@ -7,236 +7,290 @@
 
 <style>
 * {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
 }
 
 body {
-    background: #01030a;
+    background: #02040a;
     color: white;
     font-family: Arial, sans-serif;
     overflow-x: hidden;
 }
 
-.hero {
-    position: relative;
-    min-height: 100vh;
-    overflow: hidden;
-    isolation: isolate;
+/* خلفية العاصفة */
+.storm {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
     background:
-        radial-gradient(ellipse at 50% 30%,
-        #082454 0%, #030b1b 40%, #01030a 80%);
+        radial-gradient(ellipse at 50% 20%,
+        #172e4b 0%, #070d18 45%, #02040a 100%);
 }
 
-/* مساحة البرق */
-.bolt-zone {
-    position: relative;
-    height: 390px;
-    overflow: hidden;
-    z-index: 1;
+/* ومضات البرق */
+.flash {
+    position: fixed;
+    inset: 0;
+    background: #b9ddff;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 5;
 }
 
+.flash.active {
+    animation: lightning 0.7s ease-out;
+}
+
+@keyframes lightning {
+    0% { opacity: 0; }
+    10% { opacity: .8; }
+    20% { opacity: .08; }
+    35% { opacity: .6; }
+    100% { opacity: 0; }
+}
+
+/* خطوط البرق */
 .bolt {
     position: absolute;
-    width: 150%;
-    height: 240px;
-    left: -25%;
-    top: 55px;
+    top: -20px;
+    left: 22%;
+    width: 5px;
+    height: 180px;
+    background: #bde4ff;
+    box-shadow: 0 0 15px #51a9ff, 0 0 40px #1685ff;
+    clip-path: polygon(60% 0,100% 0,45% 55%,
+                       100% 55%,0 100%,30% 48%,0 48%);
     opacity: 0;
-    animation: boltFlash 3.8s infinite;
-    pointer-events: none;
 }
 
-.bolt svg {
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-}
-
-.bolt path {
-    fill: none;
-    stroke: #38cfff;
-    stroke-width: 5;
-    stroke-linejoin: round;
-    stroke-linecap: round;
-    filter:
-        drop-shadow(0 0 5px #00cfff)
-        drop-shadow(0 0 15px #008cff)
-        drop-shadow(0 0 35px #0066ff);
-}
-
-.bolt .core {
-    stroke: #ffffff;
-    stroke-width: 2;
-    filter:
-        drop-shadow(0 0 5px white)
-        drop-shadow(0 0 14px #00cfff);
-}
-
-.bolt.second {
-    top: 115px;
-    transform: rotate(9deg);
-    animation-delay: 1.2s;
-}
-
-.bolt.third {
-    top: 10px;
-    transform: rotate(-13deg);
-    animation-delay: 2.3s;
+.flash.active .bolt {
+    animation: boltFlash .7s ease-out;
 }
 
 @keyframes boltFlash {
-    0%, 12%, 18%, 100% {
-        opacity: 0;
-        transform: translateX(-40px) scaleX(.85);
-    }
-    13% {
-        opacity: 1;
-        transform: translateX(0) scaleX(1);
-    }
-    15% {
-        opacity: .25;
-    }
-    17% {
-        opacity: 1;
-    }
+    0%, 100% { opacity: 0; }
+    10%, 30% { opacity: 1; }
+    50% { opacity: .3; }
 }
 
-/* وهج البرق في الخلفية */
-.glow {
-    position: absolute;
-    width: 100%;
-    height: 250px;
-    top: 65px;
-    background: #007bff;
-    opacity: .08;
-    filter: blur(70px);
-    animation: glowPulse 2s infinite alternate;
+/* افتتاحية الموقع */
+.intro {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    overflow: hidden;
+    background: #02040a;
+    transition: opacity 1s;
+}
+
+.intro.hide {
+    opacity: 0;
     pointer-events: none;
 }
 
-@keyframes glowPulse {
-    from { opacity: .04; }
-    to { opacity: .22; }
-}
-
-/* اسم الموقع */
-.brand {
+.intro-text {
     position: absolute;
-    z-index: 4;
-    width: 100%;
-    top: 165px;
+    top: 12%;
     text-align: center;
-    padding: 0 10px;
-}
-
-.brand h1 {
-    font-size: clamp(34px, 8vw, 70px);
-    font-weight: 1000;
-    letter-spacing: 2px;
-    color: #eafaff;
-    text-shadow:
-        0 0 8px #00d9ff,
-        0 0 22px #008cff,
-        0 0 50px #0066ff;
-    animation: titleGlow 1.8s infinite alternate;
-}
-
-.brand p {
-    margin-top: 12px;
-    color: #78dfff;
-    font-size: 14px;
+    width: 100%;
+    color: #91caff;
+    font-size: 12px;
     letter-spacing: 4px;
 }
 
-@keyframes titleGlow {
-    from {
-        text-shadow: 0 0 8px #00d9ff, 0 0 20px #007bff;
+/* التنين */
+.dragon {
+    position: absolute;
+    bottom: -350px;
+    font-size: clamp(110px, 35vw, 200px);
+    filter: drop-shadow(0 0 25px #248fff);
+    transform: scale(.65);
+    opacity: 0;
+}
+
+.dragon.rise {
+    animation: dragonRise 2.1s cubic-bezier(.2,.8,.2,1) forwards;
+}
+
+@keyframes dragonRise {
+    0% {
+        bottom: -350px;
+        opacity: 0;
+        transform: scale(.5) rotate(-10deg);
     }
-    to {
-        text-shadow: 0 0 15px white, 0 0 40px #00aaff, 0 0 70px #0066ff;
+    55% {
+        opacity: 1;
+        transform: scale(1.1) rotate(5deg);
+    }
+    75% {
+        transform: scale(1) rotate(-3deg);
+    }
+    100% {
+        bottom: 22%;
+        opacity: 1;
+        transform: scale(1);
     }
 }
 
-/* قسم الألعاب - أسفل منطقة البرق */
-.games-section {
-    position: relative;
-    z-index: 3;
-    padding: 5px 18px 35px;
-    margin-top: 0;
-}
-
-.games-title {
+/* اسم الموقع */
+.intro-logo {
+    position: absolute;
+    bottom: 12%;
+    width: 100%;
     text-align: center;
-    font-size: 25px;
-    margin-bottom: 25px;
-    color: #8deaff;
-    text-shadow: 0 0 15px #007bff;
+    opacity: 0;
+    transform: translateY(25px);
+}
+
+.intro-logo.show {
+    animation: logoIn 1.2s forwards;
+}
+
+@keyframes logoIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.intro-logo h1 {
+    font-size: clamp(32px, 9vw, 58px);
+    direction: ltr;
+    text-shadow: 0 0 25px #238bff;
+}
+
+.intro-logo h1 span {
+    color: #75b9ff;
+}
+
+.intro-logo p {
+    color: #a7c9ed;
+    font-size: 13px;
+    margin-top: 15px;
+    line-height: 2;
+}
+
+/* الصفحة الرئيسية */
+header {
+    padding: 22px 15px;
+    text-align: center;
+    border-bottom: 1px solid #25364b;
+    background: #070b13;
+}
+
+header h2 {
+    color: #83bdff;
+    letter-spacing: 2px;
+    font-size: 24px;
+}
+
+.hero {
+    min-height: 320px;
+    padding: 60px 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero h1 {
+    font-size: clamp(34px, 9vw, 60px);
+    direction: ltr;
+    text-shadow: 0 0 25px #248cff;
+}
+
+.hero h1 span {
+    color: #83bdff;
+}
+
+.hero p {
+    color: #b3c0d1;
+    font-size: 14px;
+    line-height: 2;
+    margin-top: 15px;
+}
+
+.info {
+    margin-top: 25px;
+    padding: 15px 20px;
+    background: #0b1524;
+    border: 1px solid #304d70;
+    border-radius: 12px;
+    line-height: 2.5;
+}
+
+.info strong {
+    color: #86c4ff;
 }
 
 .games {
-    max-width: 950px;
+    padding: 25px 18px 50px;
+    max-width: 800px;
     margin: auto;
+}
+
+.games h2 {
+    margin-bottom: 20px;
+}
+
+.grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 18px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
 }
 
-.game {
-    min-height: 145px;
-    padding: 22px 12px;
+.card {
+    padding: 20px 10px;
     text-align: center;
-    border: 1px solid #168bd0;
-    border-radius: 15px;
-    background: rgba(3, 12, 29, .48);
-    backdrop-filter: blur(3px);
-    box-shadow: 0 0 14px #007bff22;
-    transition: .3s;
+    background: linear-gradient(145deg, #14243a, #080c14);
+    border: 1px solid #2b4565;
+    border-radius: 12px;
 }
 
-.game:hover {
-    transform: translateY(-5px);
-    border-color: #55e6ff;
-    box-shadow: 0 0 25px #008cff88;
-    background: rgba(5, 25, 52, .65);
+.card .icon {
+    font-size: 40px;
+    margin-bottom: 12px;
 }
 
-.icon {
-    font-size: 38px;
+.card h3 {
+    font-size: 15px;
     margin-bottom: 10px;
 }
 
-.game h2 {
-    color: #80e8ff;
-    font-size: 19px;
+.card p {
+    font-size: 12px;
+    color: #aab8ca;
+    line-height: 1.8;
 }
 
-.game p {
-    color: #b5cbe5;
-    font-size: 13px;
-    margin-top: 9px;
+.card button {
+    width: 100%;
+    margin-top: 14px;
+    padding: 11px;
+    background: #142d4a;
+    color: #c0e0ff;
+    border: 1px solid #426b98;
+    border-radius: 7px;
 }
 
 footer {
-    position: relative;
-    z-index: 3;
+    padding: 25px 15px;
     text-align: center;
-    padding: 20px 10px;
-    color: #6485a8;
+    border-top: 1px solid #25364b;
+    color: #a9b7c8;
     font-size: 12px;
+    line-height: 2.3;
 }
 
-@media (max-width: 500px) {
-    .bolt-zone {
-        height: 350px;
-    }
-
-    .brand {
-        top: 155px;
-    }
-
-    .games {
+@media (max-width: 360px) {
+    .grid {
         grid-template-columns: 1fr;
     }
 }
@@ -245,107 +299,175 @@ footer {
 
 <body>
 
-<main class="hero">
-
-    <div class="glow"></div>
-
-    <section class="bolt-zone">
-
-        <div class="bolt">
-            <svg viewBox="0 0 1200 240" preserveAspectRatio="none">
-                <path d="M-30 100 L100 65 L180 120 L290 35
-                L360 100 L460 45 L550 135 L660 30
-                L750 105 L850 20 L940 100 L1050 45
-                L1140 95 L1240 35"/>
-
-                <path d="M180 120 L145 170 L205 150 L220 215
-                M290 35 L270 0 L320 18 L340 -10
-                M460 45 L425 100 L485 80 L500 145
-                M660 30 L625 0 L685 18 L700 -10
-                M850 20 L830 75 L885 55 L905 115
-                M1050 45 L1025 100 L1080 80 L1100 145"/>
-
-                <path class="core" d="M-30 100 L100 65 L180 120
-                L290 35 L360 100 L460 45 L550 135 L660 30
-                L750 105 L850 20 L940 100 L1050 45
-                L1140 95 L1240 35"/>
-            </svg>
-        </div>
-
-        <div class="bolt second">
-            <svg viewBox="0 0 1200 240" preserveAspectRatio="none">
-                <path d="M-20 55 L100 125 L220 45 L330 145
-                L450 60 L570 130 L690 35 L800 115
-                L930 40 L1040 125 L1220 60"/>
-
-                <path d="M220 45 L200 0 L250 25 L275 -5
-                M450 60 L420 110 L475 90 L490 160
-                M690 35 L660 90 L715 70 L740 135
-                M930 40 L905 0 L960 20 L980 -5"/>
-            </svg>
-        </div>
-
-        <div class="bolt third">
-            <svg viewBox="0 0 1200 240" preserveAspectRatio="none">
-                <path d="M-30 130 L110 40 L230 120 L350 35
-                L470 130 L590 45 L720 120 L830 35
-                L960 125 L1080 45 L1240 100"/>
-
-                <path d="M350 35 L325 0 L380 20 L400 -10
-                M590 45 L565 100 L620 80 L640 150
-                M830 35 L805 90 L860 70 L880 135
-                M1080 45 L1055 100 L1110 80 L1130 150"/>
-            </svg>
-        </div>
-
-        <header class="brand">
-            <h1>VENOM GAMING</h1>
-            <p>ENTER THE GAME ⚡</p>
-        </header>
-
-    </section>
-
-    <section class="games-section">
-        <h2 class="games-title">اختار لعبتك 🎮</h2>
-
-        <div class="games">
-
-            <article class="game">
-           <div class="icon">🎮</div>
-<h2>GAME 01</h2>
-<p>ققريباً — عبتك الأولى</p>
-            </article> 
-
-
-            <article class="game">
-                <div class="icon">⚔️</div>
-                <h2>GAME 02</h2>
-                <p>قريباً — لعبتك التانية</p>
-            </article>
-
-            <article class="game">
-                <div class="icon">🚀</div>
-                <h2>GAME 03</h2>
-                <p>قريباً — لعبتك التالتة</p>
-            </article>
-
-        </div>
-    </section>
-
-    <footer>
-        © 2026 VENOM GAMING
-    </footer>
-
-</main>
-
-</body>
-  </html>
-<div style="background:#10182b;color:white;padding:20px;text-align:center;border-radius:15px;margin:15px;">
-  <h2 style="color:#00e5ff;">🐔 CHICKEN WARS</h2>
-  <p>استعد لمعركة الفراخ الآلية!</p>
-  <a href="chicken-wars.html"
-     style="display:inline-block;background:#00c8ff;color:#07101c;padding:14px 25px;border-radius:10px;text-decoration:none;font-weight:bold;">
-    🎮 العب دلوقتي
-  </a>
+<div class="storm"></div>
+<div class="flash" id="flash">
+    <div class="bolt"></div>
 </div>
 
+<!-- افتتاحية التنين -->
+<section class="intro" id="intro">
+
+    <div class="intro-text">A NEW GAMING WORLD</div>
+
+    <div class="dragon" id="dragon">🐉</div>
+
+    <div class="intro-logo" id="introLogo">
+        <h1>VENOM <span>GAMING</span></h1>
+        <p>
+            صاحب الموقع: <strong>VENOM</strong><br>
+            اللي بيدي الأفكار لصاحب الموقع:
+            <strong>DRAGON 🐉</strong>
+        </p>
+    </div>
+
+</section>
+
+<header>
+    <h2>⚡ VENOM GAMING ⚡</h2>
+</header>
+
+<section class="hero">
+    <h1>VENOM <span>GAMING</span></h1>
+
+    <p>
+        عالم الألعاب والمغامرات والتحديات.<br>
+        استعد لاكتشاف عالمنا!
+    </p>
+
+    <div class="info">
+        صاحب الموقع: <strong>VENOM</strong><br>
+        اللي بيدي الأفكار لصاحب الموقع:
+        <strong>DRAGON 🐉</strong>
+    </div>
+</section>
+
+<section class="games">
+    <h2>🎮 مكتبة الألعاب</h2>
+
+    <div class="grid">
+
+        <div class="card">
+            <div class="icon">🌑</div>
+            <h3>لعبة الظلام</h3>
+            <p>مغامرة غامضة وسط الظلام.</p>
+            <button onclick="openGame('darkness.html')">
+                العب الآن
+            </button>
+        </div>
+
+        <div class="card">
+            <div class="icon">🚗</div>
+            <h3>لعبة السيارات</h3>
+            <p>انطلق في عالم القيادة.</p>
+            <button onclick="openGame('cars.html')">
+                العب الآن
+            </button>
+        </div>
+
+        <div class="card">
+            <div class="icon">🧟</div>
+            <h3>عالم الزومبي</h3>
+            <p>واجه تحديات عالم الزومبي.</p>
+            <button onclick="openGame('zombies.html')">
+                العب الآن
+            </button>
+        </div>
+
+        <div class="card">
+            <div class="icon">🐉</div>
+            <h3>لعبة جديدة</h3>
+            <p>ترقب مغامراتنا القادمة.</p>
+        </div>
+
+    </div>
+</section>
+
+<footer>
+    <strong>VENOM GAMING</strong><br>
+    صاحب الموقع: VENOM<br>
+    اللي بيدي الأفكار لصاحب الموقع: DRAGON 🐉<br>
+    © 2026
+</footer>
+
+<!-- صوت الرعد: هنضيف ملفه في خطوة لاحقة -->
+<audio id="thunderSound" preload="auto">
+    <source src="thunder.mp3" type="audio/mpeg">
+</audio>
+
+<button id="soundButton"
+    style="position:fixed;bottom:15px;left:12px;z-index:20;
+    padding:12px;background:#10233b;color:white;
+    border:1px solid #5487c0;border-radius:9px;"
+    onclick="enableSound()">
+    🔊 تشغيل الصوت
+</button>
+
+<script>
+const intro = document.getElementById("intro");
+const dragon = document.getElementById("dragon");
+const flash = document.getElementById("flash");
+const introLogo = document.getElementById("introLogo");
+const thunder = document.getElementById("thunderSound");
+const soundButton = document.getElementById("soundButton");
+
+let soundEnabled = false;
+
+async function enableSound() {
+    soundEnabled = true;
+
+    try {
+        thunder.loop = true;
+        await thunder.play();
+        soundButton.textContent = "🔇 إيقاف الصوت";
+    } catch (error) {
+        soundEnabled = false;
+        alert("ملف صوت الرعد لسه مش موجود أو المتصفح منع تشغيله.");
+    }
+}
+
+soundButton.addEventListener("click", async () => {
+    if (soundEnabled && !thunder.paused) {
+        thunder.pause();
+        soundEnabled = false;
+        soundButton.textContent = "🔊 تشغيل الصوت";
+    }
+});
+
+function strikeLightning() {
+    flash.classList.remove("active");
+    void flash.offsetWidth;
+    flash.classList.add("active");
+}
+
+window.addEventListener("load", () => {
+    // برق خفيف في البداية
+    setTimeout(strikeLightning, 700);
+
+    // ضربة برق قوية وظهور التنين
+    setTimeout(() => {
+        strikeLightning();
+        dragon.classList.add("rise");
+    }, 1800);
+
+    // ظهور اسم الموقع
+    setTimeout(() => {
+        introLogo.classList.add("show");
+    }, 3500);
+
+    // انتهاء الافتتاحية
+    setTimeout(() => {
+        intro.classList.add("hide");
+
+        setTimeout(() => {
+            intro.style.display = "none";
+        }, 1100);
+    }, 6500);
+});
+
+function openGame(file) {
+    window.location.href = file;
+}
+</script>
+
+</body>
+</html>
