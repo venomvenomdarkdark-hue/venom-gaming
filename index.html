@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VENOM GAMING</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #01030a;
+    color: white;
+    font-family: Arial, sans-serif;
+    overflow-x: hidden;
+}
+
+.hero {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+    isolation: isolate;
+    background:
+        radial-gradient(ellipse at 50% 30%,
+        #082454 0%, #030b1b 40%, #01030a 80%);
+}
+
+/* مساحة البرق */
+.bolt-zone {
+    position: relative;
+    height: 390px;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.bolt {
+    position: absolute;
+    width: 150%;
+    height: 240px;
+    left: -25%;
+    top: 55px;
+    opacity: 0;
+    animation: boltFlash 3.8s infinite;
+    pointer-events: none;
+}
+
+.bolt svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.bolt path {
+    fill: none;
+    stroke: #38cfff;
+    stroke-width: 5;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    filter:
+        drop-shadow(0 0 5px #00cfff)
+        drop-shadow(0 0 15px #008cff)
+        drop-shadow(0 0 35px #0066ff);
+}
+
+.bolt .core {
+    stroke: #ffffff;
+    stroke-width: 2;
+    filter:
+        drop-shadow(0 0 5px white)
+        drop-shadow(0 0 14px #00cfff);
+}
+
+.bolt.second {
+    top: 115px;
+    transform: rotate(9deg);
+    animation-delay: 1.2s;
+}
+
+.bolt.third {
+    top: 10px;
+    transform: rotate(-13deg);
+    animation-delay: 2.3s;
+}
+
+@keyframes boltFlash {
+    0%, 12%, 18%, 100% {
+        opacity: 0;
+        transform: translateX(-40px) scaleX(.85);
+    }
+    13% {
+        opacity: 1;
+        transform: translateX(0) scaleX(1);
+    }
+    15% {
+        opacity: .25;
+    }
+    17% {
+        opacity: 1;
+    }
+}
+
+/* وهج البرق في الخلفية */
+.glow {
+    position: absolute;
+    width: 100%;
+    height: 250px;
+    top: 65px;
+    background: #007bff;
+    opacity: .08;
+    filter: blur(70px);
+    animation: glowPulse 2s infinite alternate;
+    pointer-events: none;
+}
+
+@keyframes glowPulse {
+    from { opacity: .04; }
+    to { opacity: .22; }
+}
+
+/* اسم الموقع */
+.brand {
+    position: absolute;
+    z-index: 4;
+    width: 100%;
+    top: 165px;
+    text-align: center;
+    padding: 0 10px;
+}
+
+.brand h1 {
+    font-size: clamp(34px, 8vw, 70px);
+    font-weight: 1000;
+    letter-spacing: 2px;
+    color: #eafaff;
+    text-shadow:
+        0 0 8px #00d9ff,
+        0 0 22px #008cff,
+        0 0 50px #0066ff;
+    animation: titleGlow 1.8s infinite alternate;
+}
+
+.brand p {
+    margin-top: 12px;
+    color: #78dfff;
+    font-size: 14px;
+    letter-spacing: 4px;
+}
+
+@keyframes titleGlow {
+    from {
+        text-shadow: 0 0 8px #00d9ff, 0 0 20px #007bff;
+    }
+    to {
+        text-shadow: 0 0 15px white, 0 0 40px #00aaff, 0 0 70px #0066ff;
+    }
+}
+
+/* قسم الألعاب - أسفل منطقة البرق */
+.games-section {
+    position: relative;
+    z-index: 3;
+    padding: 5px 18px 35px;
+    margin-top: 0;
+}
+
+.games-title {
+    text-align: center;
+    font-size: 25px;
+    margin-bottom: 25px;
+    color: #8deaff;
+    text-shadow: 0 0 15px #007bff;
+}
+
+.games {
+    max-width: 950px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 18px;
+}
+
+.game {
+    min-height: 145px;
+    padding: 22px 12px;
+    text-align: center;
+    border: 1px solid #168bd0;
+    border-radius: 15px;
+    background: rgba(3, 12, 29, .48);
+    backdrop-filter: blur(3px);
+    box-shadow: 0 0 14px #007bff22;
+    transition: .3s;
+}
+
+.game:hover {
+    transform: translateY(-5px);
+    border-color: #55e6ff;
+    box-shadow: 0 0 25px #008cff88;
+    background: rgba(5, 25, 52, .65);
+}
+
+.icon {
+    font-size: 38px;
+    margin-bottom: 10px;
+}
+
+.game h2 {
+    color: #80e8ff;
+    font-size: 19px;
+}
+
+.game p {
+    color: #b5cbe5;
+    font-size: 13px;
+    margin-top: 9px;
+}
+
+footer {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    padding: 20px 10px;
+    color: #6485a8;
+    font-size: 12px;
+}
+
+@media (max-width: 500px) {
+    .bolt-zone {
+        height: 350px;
+    }
+
+    .brand {
+        top: 155px;
+    }
+
+    .games {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<main class="hero">
+
+    <div class="glow"></div>
+
+    <section class="bolt-zone">
+
+        <div class="bolt">
+            <svg viewBox="0 0 1200 240" preserveAspectRatio="none">
+                <path d="M-30 100 L100 65 L180 120 L290 35
+                L360 100 L460 45 L550 135 L660 30
+                L750 105 L850 20 L940 100 L1050 45
+                L1140 95 L1240 35"/>
+
+                <path d="M180 120 L145 170 L205 150 L220 215
+                M290 35 L270 0 L320 18 L340 -10
+                M460 45 L425 100 L485 80 L500 145
+                M660 30 L625 0 L685 18 L700 -10
+                M850 20 L830 75 L885 55 L905 115
+                M1050 45 L1025 100 L1080 80 L1100 145"/>
+
+                <path class="core" d="M-30 100 L100 65 L180 120
+                L290 35 L360 100 L460 45 L550 135 L660 30
+                L750 105 L850 20 L940 100 L1050 45
+                L1140 95 L1240 35"/>
+            </svg>
+        </div>
+
+        <div class="bolt second">
+            <svg viewBox="0 0 1200 240" preserveAspectRatio="none">
+                <path d="M-20 55 L100 125 L220 45 L330 145
+                L450 60 L570 130 L690 35 L800 115
+                L930 40 L1040 125 L1220 60"/>
+
+                <path d="M220 45 L200 0 L250 25 L275 -5
+                M450 60 L420 110 L475 90 L490 160
+                M690 35 L660 90 L715 70 L740 135
+                M930 40 L905 0 L960 20 L980 -5"/>
+            </svg>
+        </div>
+
+        <div class="bolt third">
+            <svg viewBox="0 0 1200 240" preserveAspectRatio="none">
+                <path d="M-30 130 L110 40 L230 120 L350 35
+                L470 130 L590 45 L720 120 L830 35
+                L960 125 L1080 45 L1240 100"/>
+
+                <path d="M350 35 L325 0 L380 20 L400 -10
+                M590 45 L565 100 L620 80 L640 150
+                M830 35 L805 90 L860 70 L880 135
+                M1080 45 L1055 100 L1110 80 L1130 150"/>
+            </svg>
+        </div>
+
+        <header class="brand">
+            <h1>VENOM GAMING</h1>
+            <p>ENTER THE GAME ⚡</p>
+        </header>
+
+    </section>
+
+    <section class="games-section">
+        <h2 class="games-title">اختار لعبتك 🎮</h2>
+
+        <div class="games">
+
+            <article class="game">
+                <div class="icon">🎮</div>
+                <h2>GAME 01</h2>
+                <p>قريباً — لعبتك الأولى</p>
+            </article>
+
+            <article class="game">
+                <div class="icon">⚔️</div>
+                <h2>GAME 02</h2>
+                <p>قريباً — لعبتك التانية</p>
+            </article>
+
+            <article class="game">
+                <div class="icon">🚀</div>
+                <h2>GAME 03</h2>
+                <p>قريباً — لعبتك التالتة</p>
+            </article>
+
+        </div>
+    </section>
+
+    <footer>
+        © 2026 VENOM GAMING
+    </footer>
+
+</main>
+
+</body>
+  </html>
