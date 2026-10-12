@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>CHICKEN WARS | VENOM GAMING</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  background: #070b16;
+  color: white;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  overflow-x: hidden;
+}
+
+header {
+  padding: 12px 5px;
+  background: #10182b;
+  border-bottom: 2px solid #00e5ff;
+}
+
+header h1 {
+  margin: 3px;
+  color: #00e5ff;
+  font-size: 25px;
+  letter-spacing: 2px;
+}
+
+header p {
+  margin: 5px;
+  font-size: 12px;
+  color: #c5d4ed;
+}
+
+.stats {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 7px;
+  padding: 10px 4px;
+  font-size: 13px;
+}
+
+.stat {
+  background: #17223a;
+  border: 1px solid #344968;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+#game {
+  display: block;
+  width: 100%;
+  max-width: 500px;
+  height: min(66vh, 620px);
+  min-height: 390px;
+  margin: auto;
+  background: #080d20;
+  border: 2px solid #253b62;
+  border-radius: 10px;
+  touch-action: none;
+}
+
+.buttons {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 10px;
+}
+
+button {
+  border: 1px solid #00d9ff;
+  border-radius: 9px;
+  padding: 11px 14px;
+  background: #132742;
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:active {
+  background: #006d91;
+}
+
+.primary {
+  background: #007f9f;
+}
+
+#message {
+  padding: 7px;
+  color: #ffe66d;
+  min-height: 30px;
+  font-size: 14px;
+}
+
+#garage {
+  max-width: 500px;
+  margin: 10px auto;
+  padding: 12px;
+  background: #10182b;
+  border: 1px solid #344968;
+  border-radius: 12px;
+}
+
+#garage h2 {
+  color: #00e5ff;
+  font-size: 19px;
+}
+
+.vehicles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.vehicle {
+  padding: 10px 4px;
+  background: #18243b;
+  border: 1px solid #304561;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.vehicle button {
+  margin-top: 7px;
+  padding: 7px;
+  width: 95%;
+  font-size: 12px;
+}
+
+footer {
+  padding: 15px;
+  color: #8295b8;
+  font-size: 12px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>🐔 CHICKEN WARS</h1>
+  <p>VENOM GAMING • معركة الفراخ الآلية</p>
+</header>
+
+<div class="stats">
+  <div class="stat">المرحلة: <b id="level">1</b>/300</div>
+  <div class="stat">النقاط: <b id="coins">0</b></div>
+  <div class="stat">الليزر: <b id="power">1</b></div>
+  <div class="stat">الطاقة: <b id="health">100</b>%</div>
+</div>
+
+<canvas id="game"></canvas>
+
+<div id="message">اضغط ابدأ، وحرّك المركبة بإصبعك!</div>
+
+<div class="buttons">
+  <button class="primary" id="start">▶ ابدأ اللعبة</button>
+  <button id="pause">⏸ إيقاف</button>
+  <button id="sound">🔊 الصوت</button>
+  <button id="shopButton">🚀 المركبات</button>
+</div>
+
+<section id="garage">
+  <h2>🚀 متجر المركبات</h2>
+  <p>اجمع النقاط وافتح مركبات جديدة. لكل مركبة ليزر وقدرة خاصة.</p>
+  <div class="vehicles" id="vehicles"></div>
+</section>
+
+<footer>
+  CHICKEN WARS © VENOM GAMING
+</footer>
+
+<script>
+(() => {
+"use strict";
+
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+const $ = id => document.getElementById(id);
+
+const vehicleData = [
+  {name:"الشبح الأبيض", price:0, color:"#ffffff", laser:"#ffffff", ability:"ليزر سريع"},
+  {name:"الصاعقة الزرقاء", price:5000, color:"#168cff", laser:"#00e5ff", ability:"قدرة تبطيء الأعداء"},
+  {name:"التنين الأحمر", price:10000, color:"#ff3434", laser:"#ff3434", ability:"ضرر أقوى"},
+  {name:"البرق الأصفر", price:15000, color:"#ffe347", laser:"#ffe347", ability:"ضربتان إضافيتان"},
+  {name:"السم الأخضر", price:20000, color:"#38ff75", laser:"#38ff75", ability:"ضرر مستمر"},
+  {name:"الشبح البنفسجي", price:30000, color:"#bd58ff", laser:"#bd58ff", ability:"ليزر مخترق"},
+  {name:"المدمر الفضي", price:40000, color:"#cbd5e1", laser:"#cbd5e1", ability:"انفجار حول الهدف"},
+  {name:"الظلام الأسود", price:75000, color:"#7c83ff", laser:"#171717", ability:"موجة طاقة"},
+  {name:"النجم الذهبي", price:100000, color:"#ffd447", laser:"#ffd447", ability:"ليزر متشعب"},
+  {name:"الوحش الأسطوري", price:150000, color:"#ff55e8", laser:"#ff55e8", ability:"هجوم متعدد الألوان"}
+];
+
+let W = 400, H = 600;
+let running = false;
+let paused = false;
+let gameOver = false;
+let coins = 0;
+let level = 1;
+let health = 100;
+let power = 1;
+let selected = 0;
+let soundOn = true;
+let audio = null;
+
+let enemies = [];
+let bullets = [];
+let enemyBullets = [];
+let boxes = [];
+let particles = [];
+let stars = [];
+
+let lastShot = 0;
+let lastSpawn = 0;
+let lastBox = 0;
+let boss = null;
+let frame = 0;
+let nextEnemyId = 1;
+
+const player = {
+  x: 200,
+  y: 510,
+  size: 23,
+  speed: 5
+};
+
+function resize() {
+  const rect = canvas.getBoundingClientRect();
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+  W = rect.width;
+  H = rect.height;
+
+  canvas.width = Math.floor(W * dpr);
+  canvas.height = Math.floor(H * dpr);
+
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  player.x = Math.max(25, Math.min(W - 25, player.x));
+  player.y = Math.min(H - 45, Math.max(H * 0.65, player.y));
+
+  if (!stars.length) {
+    for (let i = 0; i < 65; i++) {
+      stars.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        speed: 0.5 + Math.random() * 1.5,
+        size: Math.random() * 2 + 0.5
+      });
+    }
+  }
+}
+
+window.addEventListener("resize", resize);
+
+function beep(freq = 440, duration = 0.07, type = "square") {
+  if (!soundOn) return;
+
+  try {
+    audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+
+    if (audio.state === "suspended") audio.resume();
+
+    const osc = audio.createOscillator();
+    const gain = audio.createGain();
+
+    osc.type = type;
+    osc.frequency.value = freq;
+    gain.gain.value = 0.035;
+
+    osc.connect(gain);
+    gain.connect(audio.destination);
+
+    osc.start();
+    gain.gain.exponentialRampToValueAtTime(
+      0.001,
+      audio.currentTime + duration
+    );
+    osc.stop(audio.currentTime + duration);
+  } catch (e) {}
+}
+
+function updateStats() {
+  $("level").textContent = level;
+  $("coins").textContent = coins;
+  $("power").textContent = power;
+  $("health").textContent = Math.max(0, Math.ceil(health));
+}
+
+function say(text) {
+  $("message").textContent = text;
+}
+
+function startGame() {
+  if (running && !gameOver) {
+    paused = false;
+    return;
+  }
+
+  enemies = [];
+  bullets = [];
+  enemyBullets = [];
+  boxes = [];
+  particles = [];
+  boss = null;
+
+  health = 100;
+  power = 1;
+  level = 1;
+  gameOver = false;
+  running = true;
+  paused = false;
+
+  player.x = W / 2;
+  player.y = H - 70;
+
+  lastShot = 0;
+  lastSpawn = 0;
+  lastBox = 0;
+  frame = 0;
+
+  say("بدأت المعركة! اجمع الصناديق واهزم الفراخ.");
+  updateStats();
+}
+
+function spawnEnemy() {
+  const isBoss = level % 10 === 0 && !boss;
+
+  if (isBoss) {
+    boss = {
+      x: W / 2,
+      y: 85,
+      hp: 30 + level * 4,
+      maxHp: 30 + level * 4,
+      size: Math.min(75, 42 + level / 8),
+      t: 0,
+      lastFire: 0,
+      final: level === 300
+    };
+
+    say(level === 300
+      ? "⚠️ الزعيم الأخير: الفرخة داخل الروبوت العملاق!"
+      : "👑 ظهر زعيم المرحلة " + level + "!");
+
+    beep(180, 0.35, "sawtooth");
+    return;
+  }
+
+  if (boss) return;
+
+  enemies.push({
+    id: nextEnemyId++,
+    x: 25 + Math.random() * Math.max(1, W - 50),
+    y: -25,
+    size: 19 + Math.min(8, level / 20),
+    hp: 1 + Math.floor(level / 35),
+    color: ["#fff0c2", "#f5b83d", "#e8e8e8"][Math.floor(Math.random() * 3)],
+    speed: 0.7 + Math.random() * 0.8 + level * 0.008,
+    lastFire: 0
+  });
+}
+
+function shoot() {
+  const v = vehicleData[selected];
+  const count = Math.min(7, power);
+  const gap = 11;
+
+  for (let i = 0; i < count; i++) {
+    bullets.push({
+      x: player.x + (i - (count - 1) / 2) * gap,
+      y: player.y - 22,
+      speed: 7,
+      color: v.laser,
+      damage: selected === 2 ? 2 : 1
+    });
+  }
+
+  beep(660 + power * 25, 0.035);
+}
+
+function enemyShoot(enemy) {
+  const colors = ["#ffffff", "#b65bff", "#1c8bff", "#111111"];
+
+  const color = colors[Math.floor(Math.random() * colors.length)];
+
+  enemyBullets.push({
+    x: enemy.x,
+    y: enemy.y + enemy.size,
+    vx: (player.x - enemy.x) * 0.004,
+    vy: 2.2 + level * 0.006,
+    color,
+    radius: 6
+  });
+}
+
+function bossShoot() {
+  if (!boss) return;
+
+  const count = boss.final ? 9 : 5;
+
+  for (let i = 0; i < count; i++) {
+    const angle = Math.PI * (i + 1) / (count + 1);
+
+    enemyBullets.push({
+      x: boss.x,
+      y: boss.y + boss.size * 0.3,
+      vx: Math.cos(angle) * 2.2,
+      vy: Math.sin(angle) * 2.2 + 1.2,
+      color: boss.final ? "#ff55e8" : "#b65bff",
+      radius: boss.final ? 9 : 6
+    });
+  }
+
+  // هجوم ليزر إضافي للزعيم النهائي
+  if (boss.final) {
+    enemyBullets.push({
+      x: boss.x,
+      y: boss.y + boss.size / 2,
+      vx: (player.x - boss.x) * 0.012,
+      vy: 4,
+      color: "#ff1744",
+      radius: 10
+    });
+  }
+
+  beep(160, 0.15, "sawtooth");
+}
+
+function dropBox(x, y) {
+  boxes.push({
+    x, y,
+    size: 17,
+    type: Math.random() < 0.72 ? "power" : "color"
+  });
+}
+
+function explode(x, y, color) {
+  for (let i = 0; i < 8; i++) {
+    particles.push({
+      x, y,
+      vx: (Math.random() - 0.5) * 4,
+      vy: (Math.random() - 0.5) * 4,
+      life: 24,
+      color
+    });
+  }
+}
+
+function hitEnemy(enemy, damage) {
+  enemy.hp -= damage;
+
+  if (enemy.hp <= 0) {
+    coins += 100;
+    explode(enemy.x, enemy.y, enemy.color);
+    enemy.dead = true;
+
+    if (Math.random() < 0.15) dropBox(enemy.x, enemy.y);
+
+    beep(300, 0.05);
+    updateStats();
+  }
+}
+
+function nextLevel() {
+  level++;
+
+  if (level > 300) {
+    level = 300;
+    running = false;
+    gameOver = true;
+    say("🏆 انتصرت! أنهيت مراحل CHICKEN WARS كلها!");
+    return;
+  }
+
+  say("تم إنهاء المرحلة! وصلت للمرحلة " + level);
+  updateStats();
+}
+
+function drawBackground() {
+  ctx.fillStyle = "#080d20";
+  ctx.fillRect(0, 0, W, H);
+
+  for (const s of stars) {
+    s.y += s.speed;
+
+    if (s.y > H) {
+      s.y = 0;
+      s.x = Math.random() * W;
+    }
+
+    ctx.fillStyle = "#7b9ac8";
+    ctx.globalAlpha = 0.5 + Math.random() * 0.4;
+    ctx.fillRect(s.x, s.y, s.size, s.size);
+  }
+
+  ctx.globalAlpha = 1;
+}
+
+function drawPlayer() {
+  const v = vehicleData[selected];
+
+  ctx.save();
+  ctx.translate(player.x, player.y);
+
+  // جسم المركبة
+  ctx.shadowBlur = 14;
+  ctx.shadowColor = v.color;
+  ctx.fillStyle = v.color;
+  ctx.beginPath();
+  ctx.moveTo(0, -25);
+  ctx.lineTo(20, 15);
+  ctx.lineTo(7, 11);
+  ctx.lineTo(0, 17);
+  ctx.lineTo(-7, 11);
+  ctx.lineTo(-20, 15);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = "#182b48";
+  ctx.beginPath();
+  ctx.ellipse(0, -5, 6, 11, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = v.laser;
+  ctx.fillRect(-3, -25, 6, 12);
+
+  ctx.restore();
+}
+
+function drawEnemy(e) {
+  ctx.save();
+  ctx.translate(e.x, e.y);
+
+  ctx.fillStyle = e.color;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, e.size, e.size * 0.85, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // عرف الفرخة
+  ctx.fillStyle = "#ff3434";
+  ctx.beginPath();
+  ctx.arc(-5, -e.size * 0.8, 5, 0, Math.PI * 2);
+  ctx.arc(2, -e.size * 0.9, 5, 0, Math.PI * 2);
+  ctx.fill();
+
+  // المنقار
+  ctx.fillStyle = "#ffbd32";
+  ctx.beginPath();
+  ctx.moveTo(e.size - 2, -3);
+  ctx.lineTo(e.size + 9, 2);
+  ctx.lineTo(e.size - 2, 6);
+  ctx.fill();
+
+  ctx.fillStyle = "#111";
+  ctx.beginPath();
+  ctx.arc(6, -5, 2, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+function drawBoss() {
+  if (!boss) return;
+
+  ctx.save();
+  ctx.translate(boss.x, boss.y);
+
+  const s = boss.size;
+
+  // الروبوت العملاق
+  ctx.shadowBlur = 18;
+  ctx.shadowColor = boss.final ? "#ff00d4" : "#00e5ff";
+  ctx.fillStyle = boss.final ? "#57144d" : "#193b59";
+  ctx.fillRect(-s, -s * 0.35, s * 2, s * 1.2);
+
+  ctx.shadowBlur = 0;
+  ctx.strokeStyle = boss.final ? "#ff55e8" : "#00e5ff";
+  ctx.lineWidth = 3;
+  ctx.strokeRect(-s, -s * 0.35, s * 2, s * 1.2);
+
+  // وجه الفرخة داخل الروبوت
+  ctx.fillStyle = "#ffe2a0";
+  ctx.beginPath();
+  ctx.ellipse(0, -s * 0.2, s * 0.62, s * 0.57, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // العرف
+  ctx.fillStyle = "#ff3434";
+  ctx.beginPath();
+  ctx.arc(-12, -s * 0.72, 9, 0, Math.PI * 2);
+  ctx.arc(0, -s * 0.78, 10, 0, Math.PI * 2);
+  ctx.arc(12, -s * 0.72, 9, 0, Math.PI * 2);
+  ctx.fill();
+
+  // عينان آليتان
+  ctx.fillStyle = "#ff1744";
+  ctx.fillRect(-s * 0.36, -s * 0.25, 12, 7);
+  ctx.fillRect(s * 0.12, -s * 0.25, 12, 7);
+
+  // مدفع الروبوت
+  ctx.fillStyle = "#8eacc7";
+  ctx.fillRect(-s * 0.15, s * 0.35, s * 0.3, s * 0.55);
+
+  ctx.restore();
+
+  // شريط طاقة الزعيم
+  const barW = Math.min(W * 0.7, 260);
+  const ratio = Math.max(0, boss.hp / boss.maxHp);
+
+  ctx.fillStyle = "#301b30";
+  ctx.fillRect((W - barW) / 2, 12, barW, 9);
+
+  ctx.fillStyle = "#ff2255";
+  ctx.fillRect((W - barW) / 2, 12, barW * ratio, 9);
+
+  ctx.fillStyle = "white";
+  ctx.font = "12px Arial";
+  ctx.fillText(boss.final ? "الزعيم الأخير" : "زعيم المرحلة", W / 2, 35);
+}
+
+function drawBullet(b) {
+  ctx.save();
+  ctx.shadowBlur = 12;
+  ctx.shadowColor = b.color;
+  ctx.fillStyle = b.color;
+  ctx.fillRect(b.x - 2, b.y - 10, 4, 15);
+  ctx.restore();
+}
+
+function drawEgg(b) {
+  ctx.save();
+  ctx.fillStyle = b.color;
+  ctx.shadowBlur = 7;
+  ctx.shadowColor = b.color;
+  ctx.beginPath();
+  ctx.ellipse(b.x, b.y, b.radius, b.radius * 1.4, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawBox(b) {
+  ctx.fillStyle = b.type === "power" ? "#ffd447" : "#bd58ff";
+  ctx.fillRect(b.x - 12, b.y - 12, 24, 24);
+
+  ctx.strokeStyle = "white";
+  ctx.lineWidth = 2;
+  ctx.strokeRect(b.x - 12, b.y - 12, 24, 24);
+
+  ctx.fillStyle = "#10182b";
+  ctx.font = "bold 17px Arial";
+  ctx.textAlign = "center";
+  ctx.fillText(b.type === "power" ? "+" : "★", b.x, b.y + 6);
+}
+
+function draw() {
+  drawBackground();
+
+  for (const b of bullets) drawBullet(b);
+  for (const e of enemies) drawEnemy(e);
+  for (const b of enemyBullets) drawEgg(b);
+  for (const b of boxes) drawBox(b);
+
+  drawBoss();
+  drawPlayer();
+
+  for (const p of particles) {
+    ctx.globalAlpha = p.life / 24;
+    ctx.fillStyle = p.color;
+    ctx.fillRect(p.x, p.y, 4, 4);
+  }
+
+  ctx.globalAlpha = 1;
+
+  if (!running && !gameOver) {
+    ctx.fillStyle = "rgba(0,0,0,0.4)";
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.fillStyle = "#00e5ff";
+    ctx.font = "bold 25px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("CHICKEN WARS", W / 2, H / 2 - 20);
+
+    ctx.fillStyle = "white";
+    ctx.font = "16px Arial";
+    ctx.fillText("اضغط ابدأ للعب", W / 2, H / 2 + 20);
+  }
+
+  if (paused) {
+    ctx.fillStyle = "rgba(0,0,0,0.6)";
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = "#ffe66d";
+    ctx.font = "bold 25px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("اللعبة متوقفة", W / 2, H / 2);
+  }
+
+  if (gameOver) {
+    ctx.fillStyle = "rgba(0,0,0,0.72)";
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.fillStyle = health <= 0 ? "#ff5964" : "#ffe66d";
+    ctx.font = "bold 25px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText(
+      health <= 0 ? "انتهت المعركة!" : "انتصرت!",
+      W / 2,
+      H / 2 - 10
+    );
+
+    ctx.fillStyle = "white";
+    ctx.font = "15px Arial";
+    ctx.fillText("اضغط ابدأ للعب مرة أخرى", W / 2, H / 2 + 25);
+  }
+}
+
+function update() {
+  if (!running || paused || gameOver) return;
+
+  frame++;
+
+  if (frame - lastShot > Math.max(8, 17 - power)) {
+    shoot();
+    lastShot = frame;
+  }
+
+  if (frame - lastSpawn > Math.max(22, 65 - level / 6)) {
+    spawnEnemy();
+    lastSpawn = frame;
+  }
+
+  if (frame - lastBox > 440) {
+    dropBox(20 + Math.random() * (W - 40), -20);
+    lastBox = frame;
+  }
+
+  // تحريك الليزر
+  for (const b of bullets) b.y -= b.speed;
+  bullets = bullets.filter(b => b.y > -25);
+
+  // تحريك الفراخ
+  for (const e of enemies) {
+    e.y += e.speed;
+    e.x += Math.sin(frame / 30 + e.id) * 0.45;
+
+    if (frame - e.lastFire > 100 + Math.random() * 100) {
+      enemyShoot(e);
+      e.lastFire = frame;
+    }
+
+    if (e.y > H + 20) {
+      e.dead = true;
+    }
+  }
+
+  // البيض
+  for (const b of enemyBullets) {
+    b.x += b.vx;
+    b.y += b.vy;
+
+    const d = Math.hypot(b.x - player.x, b.y - player.y);
+
+    if (d < player.size + b.radius) {
+      health -= 7;
+      b.dead = true;
+      explode(player.x, player.y, "#ff5964");
+      beep(120, 0.1, "sawtooth");
+      updateStats();
+    }
+  }
+
+  // صناديق التطوير
+  for (const b of boxes) {
+    b.y += 1.6;
+
+    if (Math.hypot(b.x - player.x, b.y - player.y) < 35) {
+      if (b.type === "power") {
+        power = Math.min(7, power + 1);
+        say("⚡ الليزر اتطور! المستوى " + power);
+      } else {
+        power = Math.min(7, power + 1);
+        say("🌟 حصلت على تطوير إضافي لليزر!");
+      }
+
+      coins += 50;
+      b.dead = true;
+      beep(900, 0.15, "sine");
+      updateStats();
+    }
+
+    if (b.y > H + 20) b.dead = true;
+  }
+
+  // ضرب الفراخ بالليزر
+  for (const b of bullets) {
+    if (b.dead) continue;
+
+    for (const e of enemies) {
+      if (e.dead) continue;
+
+      if (Math.hypot(b.x - e.x, b.y - e.y) < e.size + 8) {
+        hitEnemy(e, b.damage);
+        b.dead = true;
+        break;
+      }
+    }
+
+    if (boss && !b.dead &&
+        Math.hypot(b.x - boss.x, b.y - boss.y) < boss.size) {
+      boss.hp -= b.damage;
+
+      if (boss.hp <= 0) {
+        coins += level === 300 ? 10000 : 500 + level * 10;
+        explode(boss.x, boss.y, "#ff55e8");
+        boss = null;
+        nextLevel();
+        updateStats();
+      }
+
+      b.dead = true;
+    }
+  }
+
+  // حركة الزعيم وهجماته
+  if (boss) {
+    boss.t++;
+    boss.x = W / 2 + Math.sin(boss.t / 45) * Math.max(0, W / 2 - boss.size - 10);
+
+    if (frame - boss.lastFire > (boss.final ? 35 : 75)) {
+      bossShoot();
+      boss.lastFire = frame;
+    }
+  }
+
+  // اصطدام المركبة بالفراخ
+  for (const e of enemies) {
+    if (!e.dead && Math.hypot(e.x - player.x, e.y - player.y) < e.size + 14) {
+      health -= 15;
+      e.dead = true;
+      updateStats();
+    }
+  }
+
+  enemies = enemies.filter(e => !e.dead);
+  bullets = bullets.filter(b => !b.dead);
+  enemyBullets = enemyBullets.filter(b => !b.dead && b.y < H + 30);
+  boxes = boxes.filter(b => !b.dead);
+  particles = particles.filter(p => p.life-- > 0);
+
+  for (const p of particles) {
+    p.x += p.vx;
+    p.y += p.vy;
+  }
+
+  if (health <= 0) {
+    health = 0;
+    running = false;
+    gameOver = true;
+    say("انتهت المعركة! اجمع نقاطًا واشترِ مركبة أقوى.");
+    updateStats();
+  }
+}
+
+function loop() {
+  update();
+  draw();
+  requestAnimationFrame(loop);
+}
+
+// تحريك المركبة باللمس أو الماوس
+let dragging = false;
+
+function movePlayer(event) {
+  if (!dragging || paused || gameOver) return;
+
+  const rect = canvas.getBoundingClientRect();
+
+  player.x = Math.max(
+    22,
+    Math.min(W - 22, event.clientX - rect.left)
+  );
+
+  player.y = Math.max(
+    H * 0.58,
+    Math.min(H - 32, event.clientY - rect.top)
+  );
+}
+
+canvas.addEventListener("pointerdown", e => {
+  dragging = true;
+  canvas.setPointerCapture(e.pointerId);
+  movePlayer(e);
+});
+
+canvas.addEventListener("pointermove", movePlayer);
+
+canvas.addEventListener("pointerup", () => {
+  dragging = false;
+});
+
+canvas.addEventListener("pointercancel", () => {
+  dragging = false;
+});
+
+$("start").addEventListener("click", startGame);
+
+$("pause").addEventListener("click", () => {
+  if (!running) return;
+
+  paused = !paused;
+  say(paused ? "اللعبة متوقفة مؤقتًا." : "رجعنا للمعركة!");
+});
+
+$("sound").addEventListener("click", () => {
+  soundOn = !soundOn;
+  $("sound").textContent = soundOn ? "🔊 الصوت" : "🔇 الصوت";
+});
+
+$("shopButton").addEventListener("click", () => {
+  $("garage").scrollIntoView({behavior:"smooth"});
+});
+
+function renderGarage() {
+  const container = $("vehicles");
+  container.innerHTML = "";
+
+  vehicleData.forEach((v, i) => {
+    const card = document.createElement("div");
+    card.className = "vehicle";
+
+    const owned = i === 0 || coins >= v.price;
+
+    card.innerHTML = `
+      <div style="font-size:25px;color:${v.color}">🚀</div>
+      <strong>${v.name}</strong>
+      <p>السعر: ${v.price.toLocaleString("en-US")}</p>
+      <p>الليزر: <span style="color:${v.laser}">${v.laser}</span></p>
+      <p>${v.ability}</p>
+      <button>${selected === i ? "المركبة الحالية" : i === 0 ? "اختيار" : owned ? "شراء واختيار" : "شراء"}</button>
+    `;
+
+    card.querySelector("button").addEventListener("click", () => {
+      if (selected === i) {
+        say("المركبة دي مختارة بالفعل!");
+        return;
+      }
+
+      if (i !== 0 && coins < v.price) {
+        say("لسه محتاج " + (v.price - coins) + " نقطة عشان تشتريها.");
+        return;
+      }
+
+      if (i !== 0) coins -= v.price;
+
+      selected = i;
+      updateStats();
+      renderGarage();
+      say("اخترت " + v.name + "! ليزر: " + v.ability);
+      beep(800, 0.12, "sine");
+    });
+
+    container.appendChild(card);
+  });
+}
+
+resize();
+renderGarage();
+updateStats();
+loop();
+
+})();
+</script>
+
+</body>
+  </html>
