@@ -24,9 +24,10 @@ body {
     position: fixed;
     inset: 0;
     z-index: -2;
-    background:
-        radial-gradient(ellipse at 50% 20%,
-        #172e4b 0%, #070d18 45%, #02040a 100%);
+    background: radial-gradient(
+        ellipse at 50% 20%,
+        #172e4b 0%, #070d18 45%, #02040a 100%
+    );
 }
 
 /* ومضات البرق */
@@ -60,8 +61,10 @@ body {
     height: 180px;
     background: #bde4ff;
     box-shadow: 0 0 15px #51a9ff, 0 0 40px #1685ff;
-    clip-path: polygon(60% 0,100% 0,45% 55%,
-                       100% 55%,0 100%,30% 48%,0 48%);
+    clip-path: polygon(
+        60% 0,100% 0,45% 55%,
+        100% 55%,0 100%,30% 48%,0 48%
+    );
     opacity: 0;
 }
 
@@ -359,7 +362,7 @@ footer {
 
     <div class="grid">
 
-        <!-- لعبة الظلام: كما هي -->
+        <!-- لعبة الظلام الأصلية -->
         <div class="card">
             <div class="icon">🌑</div>
             <h3>لعبة الظلام</h3>
@@ -370,7 +373,7 @@ footer {
             </button>
         </div>
 
-        <!-- لعبة الفرخة -->
+        <!-- لعبة الفرخة الأصلية -->
         <div class="card">
             <div class="icon">🐔</div>
             <h3>CHICKEN WARS</h3>
@@ -378,6 +381,17 @@ footer {
 
             <button onclick="openGame('chicken-wars.html')">
                 🐔 العب لعبة الفرخة
+            </button>
+        </div>
+
+        <!-- كارت DRAGON GAMES الجديد فقط -->
+        <div class="card">
+            <div class="icon">🐉</div>
+            <h3>DRAGON GAMES</h3>
+            <p>استكشف العالم المفتوح وابدأ مغامرتك!</p>
+
+            <button onclick="openGame('dragon-games.html')">
+                🐉 العب الآن
             </button>
         </div>
 
@@ -397,7 +411,8 @@ footer {
     <source src="thunder.mp3" type="audio/mpeg">
 </audio>
 
-<button id="soundButton"
+<button
+    id="soundButton"
     style="position:fixed;bottom:15px;left:12px;z-index:20;
     padding:12px;background:#10233b;color:white;
     border:1px solid #5487c0;border-radius:9px;"
